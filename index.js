@@ -1,52 +1,35 @@
-import { useState } from "react";
-const getValidLength = (value, maxLength) => {
-  if (value.length === 0) return true;
-  return value.length === maxLength;
-};
-const parseNumber = (value) => {
-  return value.replace(/[^0-9]/g, "");
-};
-function useCardCVC() {
-  const [value, setValue] = useState("");
-  const onChange = (e) => {
-    const originValue = e.target.value;
-    const parsedValue = parseNumber(originValue);
-    if (parsedValue.length > 3) return;
-    setValue(parsedValue);
-  };
-  const isError = !getValidLength(value, 3);
-  const errorMessage = isError ? "한 칸은 3자리 숫자를 입력해야합니다." : "";
+import { useState as d } from "react";
+const M = (e, r) => e.length === 0 ? !0 : e.length === r, m = (e) => e.replace(/[^0-9]/g, "");
+function p() {
+  const [e, r] = d(""), s = (n) => {
+    const a = n.target.value, u = m(a);
+    u.length > 3 || r(u);
+  }, t = !M(e, 3);
   return {
-    value,
-    isError,
-    onChange,
-    errorMessage
+    value: e,
+    isError: t,
+    onChange: s,
+    errorMessage: t ? "한 칸은 3자리 숫자를 입력해야합니다." : ""
   };
 }
-const makeNumbers = (start, end) => {
-  return Array.from({ length: end - start + 1 }, (_, i) => start + i).map(
-    String
-  );
-};
-function formatByGroups(value, groups) {
-  const result = [];
-  let cursor = 0;
-  const lastIdx = groups.length - 1;
-  for (let i = 0; i < groups.length; i++) {
-    let part;
-    if (i < lastIdx) {
-      part = value.slice(cursor, cursor + groups[i]);
-      cursor += groups[i];
-      if (!part) break;
-      result.push(part);
-    } else {
-      part = value.slice(cursor);
-      if (part) result.push(part);
-    }
+const h = (e, r) => Array.from({ length: r - e + 1 }, (s, t) => e + t).map(
+  String
+);
+function A(e, r) {
+  const s = [];
+  let t = 0;
+  const o = r.length - 1;
+  for (let n = 0; n < r.length; n++) {
+    let a;
+    if (n < o) {
+      if (a = e.slice(t, t + r[n]), t += r[n], !a) break;
+      s.push(a);
+    } else
+      a = e.slice(t), a && s.push(a);
   }
-  return result;
+  return s;
 }
-const rules = [
+const N = [
   // Visa
   {
     cardBrand: "Visa",
@@ -79,9 +62,9 @@ const rules = [
   {
     cardBrand: "UnionPay",
     startNumbers: [
-      ...makeNumbers(622126, 622925),
-      ...makeNumbers(624, 626),
-      ...makeNumbers(6282, 6288)
+      ...h(622126, 622925),
+      ...h(624, 626),
+      ...h(6282, 6288)
     ],
     lengthArray: [4, 4, 4, 4],
     message: "4-4-4-4 형태의 16자리로 입력해주세요"
@@ -92,172 +75,130 @@ const rules = [
     lengthArray: [4, 4, 4, 4],
     message: "4-4-4-4 형태의 16자리로 16자리로 입력해주세요"
   }
-];
-const validate = (cardNumbersValue, addedRules = []) => {
-  const cardNumbers = cardNumbersValue.replace(/' '/g, "");
-  const rule = rules.concat(addedRules).find(({ startNumbers }) => {
-    return startNumbers.find((startNumber) => {
-      const startNummberLength = startNumber.length;
-      return cardNumbers.slice(0, startNummberLength) === startNumber;
-    });
-  });
-  if (!rule)
+], E = (e, r = []) => {
+  const s = e.replace(/' '/g, ""), t = N.concat(r).find(({ startNumbers: c }) => c.find((l) => {
+    const f = l.length;
+    return s.slice(0, f) === l;
+  }));
+  if (!t)
     return {
-      isError: false,
+      isError: !1,
       message: ""
     };
-  const { lengthArray } = rule;
-  const totalLength = lengthArray.reduce((a, b) => a + b, 0);
-  let isError = false;
-  let message = "";
-  if (totalLength !== cardNumbers.length) {
-    isError = true;
-    message = rule.message;
-  }
-  const formatted = formatByGroups(cardNumbers, lengthArray);
+  const { lengthArray: o } = t, n = o.reduce((c, l) => c + l, 0);
+  let a = !1, u = "";
+  n !== s.length && (a = !0, u = t.message);
+  const i = A(s, o);
   return {
-    isError,
-    message,
-    cardBrand: rule.cardBrand,
-    formatted,
-    lengthArray
+    isError: a,
+    message: u,
+    cardBrand: t.cardBrand,
+    formatted: i,
+    lengthArray: o
   };
 };
-function useCardNumber(addedRules) {
-  const [value, setCardNumber] = useState("");
-  const onChange = (e) => {
-    const originValue = e.target.value;
-    const parsedvalue = parseNumber(originValue);
-    setCardNumber(parsedvalue);
-  };
-  const { isError, message, cardBrand, formatted } = validate(
-    value,
-    addedRules
+function y(e) {
+  const [r, s] = d(""), t = (i) => {
+    const c = i.target.value, l = m(c);
+    s(l);
+  }, { isError: o, message: n, cardBrand: a, formatted: u } = E(
+    r,
+    e
   );
   return {
-    cardBrand,
-    formatted,
-    isError,
-    errorMessage: message,
-    onChange
+    cardBrand: a,
+    formatted: u,
+    isError: o,
+    errorMessage: n,
+    onChange: t
   };
 }
-function useCardPassword() {
-  const [value, setValue] = useState("");
-  const onChange = (e) => {
-    const originValue = e.target.value;
-    const parsedValue = parseNumber(originValue);
-    if (parsedValue.length > 2) return;
-    setValue(parsedValue);
-  };
-  const isError = !getValidLength(value, 2);
-  const errorMessage = isError ? "한 칸은 2자리 숫자를 입력해야합니다." : "";
+function G() {
+  const [e, r] = d(""), s = (n) => {
+    const a = n.target.value, u = m(a);
+    u.length > 2 || r(u);
+  }, t = !M(e, 2);
   return {
-    value,
-    isError,
-    onChange,
-    errorMessage
+    value: e,
+    isError: t,
+    onChange: s,
+    errorMessage: t ? "한 칸은 2자리 숫자를 입력해야합니다." : ""
   };
 }
-const MESSAGE = {
+const g = {
   INVALID_DATE_MSG: "현재보다 이전값을 유효기간으로 선택할 수 없습니다.",
   FORMAT_MONTH_MSG: "MM형식으로 입력해주세요. (ex. 01)",
   FORMAT_YEAR_MSG: "YY형식으로 입력해주세요. (ex. 01)",
   MONTH_RANGE_MSG: "1~12사이의 올바른 월을 입력해 주세요."
-};
-const expiryRules = [
+}, _ = [
   {
-    test: ({ monthString }) => {
-      if (!monthString) return false;
-      return monthString.length === 2;
-    },
+    test: ({ monthString: e }) => e ? e.length === 2 : !1,
     field: "month",
-    message: MESSAGE.FORMAT_MONTH_MSG
+    message: g.FORMAT_MONTH_MSG
   },
   {
-    test: ({ yearString }) => {
-      if (!yearString) return false;
-      return yearString.length === 2;
+    test: ({ yearString: e }) => e ? e.length === 2 : !1,
+    field: "year",
+    message: g.FORMAT_YEAR_MSG
+  },
+  {
+    test: ({ month: e }) => e >= 1 && e <= 12,
+    field: "month",
+    message: g.MONTH_RANGE_MSG
+  },
+  {
+    test: ({ year: e }) => {
+      const r = Number((/* @__PURE__ */ new Date()).getFullYear().toString().slice(2));
+      return e >= r;
     },
     field: "year",
-    message: MESSAGE.FORMAT_YEAR_MSG
+    message: g.INVALID_DATE_MSG
   },
   {
-    test: ({ month }) => {
-      return month >= 1 && month <= 12;
-    },
-    field: "month",
-    message: MESSAGE.MONTH_RANGE_MSG
-  },
-  {
-    test: ({ year }) => {
-      const currentYear = Number((/* @__PURE__ */ new Date()).getFullYear().toString().slice(2));
-      return year >= currentYear;
-    },
-    field: "year",
-    message: MESSAGE.INVALID_DATE_MSG
-  },
-  {
-    test: ({ month, year }) => {
-      const now = /* @__PURE__ */ new Date();
-      const currentYear = Number.parseInt(
+    test: ({ month: e, year: r }) => {
+      const s = /* @__PURE__ */ new Date(), t = Number.parseInt(
         (/* @__PURE__ */ new Date()).getFullYear().toString().slice(2),
         10
-      );
-      const currentMonth = now.getMonth() + 1;
-      if (currentYear < year) return true;
-      return currentYear === year && month >= currentMonth;
+      ), o = s.getMonth() + 1;
+      return t < r ? !0 : t === r && e >= o;
     },
     field: "month",
-    message: MESSAGE.INVALID_DATE_MSG
+    message: g.INVALID_DATE_MSG
   }
-];
-const validateExpiry = (monthString, yearString, rules2 = []) => {
-  if (monthString === "" && yearString === "")
+], b = (e, r, s = []) => {
+  if (e === "" && r === "")
     return { message: "", field: null };
-  const month = Number(monthString);
-  const year = Number(yearString);
-  const invalid = expiryRules.concat(rules2).find((rule) => !rule.test({ monthString, yearString, month, year }));
-  if (invalid) {
-    return { message: invalid.message, field: invalid.field };
-  }
-  return { message: "", field: null };
+  const t = Number(e), o = Number(r), n = _.concat(s).find((a) => !a.test({ monthString: e, yearString: r, month: t, year: o }));
+  return n ? { message: n.message, field: n.field } : { message: "", field: null };
 };
-function useExpirationPeriod(rules2) {
-  const [value, setValue] = useState({
+function C(e) {
+  const [r, s] = d({
     month: "",
     year: ""
-  });
-  const onChange = (e, type) => {
-    const originValue = e.target.value;
-    const parsedValue = parseNumber(originValue);
-    if (parsedValue.length > 2) {
-      return;
-    }
-    setValue((prev) => ({
-      ...prev,
-      [type]: parsedValue
+  }), t = (u, i) => {
+    const c = u.target.value, l = m(c);
+    l.length > 2 || s((f) => ({
+      ...f,
+      [i]: l
     }));
-  };
-  const { message: errorMessage, field } = validateExpiry(
-    value.month,
-    value.year,
-    rules2
+  }, { message: o, field: n } = b(
+    r.month,
+    r.year,
+    e
   );
-  const isError = {
-    month: field === "month",
-    year: field === "year"
-  };
   return {
-    value,
-    isError,
-    onChange,
-    errorMessage
+    value: r,
+    isError: {
+      month: n === "month",
+      year: n === "year"
+    },
+    onChange: t,
+    errorMessage: o
   };
 }
 export {
-  useCardCVC,
-  useCardNumber,
-  useCardPassword,
-  useExpirationPeriod
+  p as useCardCVC,
+  y as useCardNumber,
+  G as useCardPassword,
+  C as useExpirationPeriod
 };
