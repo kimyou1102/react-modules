@@ -23,6 +23,11 @@ function useCardCVC() {
     errorMessage
   };
 }
+const makeNumbers = (start, end) => {
+  return Array.from({ length: end - start + 1 }, (_, i) => start + i).map(
+    String
+  );
+};
 function formatByGroups(value, groups) {
   const result = [];
   let cursor = 0;
@@ -41,11 +46,6 @@ function formatByGroups(value, groups) {
   }
   return result;
 }
-const makeNumbers = (start, end) => {
-  return Array.from({ length: end - start + 1 }, (_, i) => start + i).map(
-    String
-  );
-};
 const rules = [
   // Visa
   {
